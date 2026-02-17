@@ -2,7 +2,7 @@
 import { auth, db, storage } from "../js/firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
 
 let currentUser = null;
 
@@ -26,33 +26,13 @@ realFile.addEventListener("change", () => {
   customText.textContent = file ? file.name : "No file chosen, yet.";
 });
 
-// Progress bar elements (injected once)
-function getOrCreateProgressBar() {
-  let wrapper = document.getElementById("progress-wrapper");
-  if (!wrapper) {
-    wrapper = document.createElement("div");
-    wrapper.id = "progress-wrapper";
-    wrapper.style.cssText = `
-      margin-top: 14px;
-      width: 100%;
-    `;
-    wrapper.innerHTML = `
-      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
-        <span>Uploading file...</span>
-        <span id="progress-pct">0%</span>
-      </div>
-      <div style="background:#e0e0e0; border-radius:999px; height:10px; overflow:hidden;">
-        <div id="progress-bar" style="height:100%; width:0%; background:#6c63ff; border-radius:999px; transition: width 0.3s ease;"></div>
-      </div>
-    `;
-    form.after(wrapper);
-  }
-  return wrapper;
-}
-
 // Form submit
-const form       = document.querySelector(".upload-form");
-const confirmBtn = document.querySelector(".confirm-btn");
+const form        = document.querySelector(".upload-form");
+const confirmBtn  = document.querySelector(".confirm-btn");
+const progressBox = document.getElementById("progress-box");
+const progressBar = document.getElementById("progress-fill");
+const progressPct = document.getElementById("progress-pct");
+const messageEl   = document.getElementById("upload-message");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -74,85 +54,73 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Remove any old message
-  const oldMsg = document.getElementById("upload-message");
-  if (oldMsg) oldMsg.remove();
-
+  hideMessage();
   confirmBtn.disabled    = true;
   confirmBtn.textContent = "Uploading...";
 
-  // Show progress bar at 0%
-  const progressWrapper = getOrCreateProgressBar();
-  progressWrapper.style.display = "block";
-  document.getElementById("progress-bar").style.width = "0%";
-  document.getElementById("progress-pct").textContent  = "0%";
+  // Show progress bar as indeterminate (animating) while uploading
+  progressBox.style.display = "block";
+  progressPct.textContent   = "Uploading...";
+  progressBar.style.width   = "30%";
+  progressBar.style.transition = "none";
+
+  // Animate bar slowly to 90% while waiting
+  setTimeout(() => {
+    progressBar.style.transition = "width 8s ease";
+    progressBar.style.width      = "90%";
+  }, 100);
 
   try {
-    const fileRef    = ref(storage, `research/${Date.now()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(fileRef, file);
+    // uploadBytes instead of uploadBytesResumable — simpler, no CORS issues
+    const fileRef = ref(storage, `research/${Date.now()}_${file.name}`);
+    await uploadBytes(fileRef, file);
 
-    uploadTask.on("state_changed",
-      (snapshot) => {
-        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        document.getElementById("progress-bar").style.width = `${pct}%`;
-        document.getElementById("progress-pct").textContent  = `${pct}%`;
-      },
-      (error) => {
-        console.error(error);
-        progressWrapper.style.display = "none";
-        showMessage("File upload failed. Try again.", "error");
-        confirmBtn.disabled    = false;
-        confirmBtn.textContent = "Confirm & Submit";
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+    // Done — jump to 100%
+    progressBar.style.transition = "width 0.3s ease";
+    progressBar.style.width      = "100%";
+    progressPct.textContent      = "100%";
 
-        await addDoc(collection(db, "research"), {
-          title,
-          authors,
-          department,
-          schoolYear,
-          fileURL:    downloadURL,
-          fileName:   file.name,
-          uploadedBy: currentUser.displayName || currentUser.email,
-          userId:     currentUser.uid,
-          status:     "pending",
-          createdAt:  serverTimestamp()
-        });
+    const downloadURL = await getDownloadURL(fileRef);
 
-        progressWrapper.style.display = "none";
-        showMessage("Research submitted! It is now pending review.", "success");
-        form.reset();
-        customText.textContent = "No file chosen, yet.";
-        confirmBtn.disabled    = false;
-        confirmBtn.textContent = "Confirm & Submit";
-      }
-    );
+    await addDoc(collection(db, "research"), {
+      title,
+      authors,
+      department,
+      schoolYear,
+      fileURL:    downloadURL,
+      fileName:   file.name,
+      uploadedBy: currentUser.displayName || currentUser.email,
+      userId:     currentUser.uid,
+      status:     "pending",
+      createdAt:  serverTimestamp()
+    });
+
+    setTimeout(() => {
+      progressBox.style.display = "none";
+      showMessage("Research submitted! It is now pending review.", "success");
+      form.reset();
+      customText.textContent = "No file chosen, yet.";
+      confirmBtn.disabled    = false;
+      confirmBtn.textContent = "Confirm & Submit";
+    }, 500);
+
   } catch (err) {
-    console.error(err);
-    showMessage("Something went wrong. Please try again.", "error");
+    console.error("Upload error:", err.code, err.message);
+    progressBox.style.display = "none";
+    showMessage("Upload failed: " + (err.message || "Please check your connection."), "error");
     confirmBtn.disabled    = false;
     confirmBtn.textContent = "Confirm & Submit";
   }
 });
 
 function showMessage(msg, type) {
-  let el = document.getElementById("upload-message");
-  if (!el) {
-    el = document.createElement("p");
-    el.id = "upload-message";
-    el.style.cssText = `
-      margin-top: 14px;
-      font-size: 13px;
-      font-weight: 500;
-      text-align: center;
-      padding: 10px 14px;
-      border-radius: 8px;
-    `;
-    form.after(el);
-  }
-  el.textContent           = msg;
-  el.style.color           = type === "success" ? "#155724" : "#721c24";
-  el.style.backgroundColor = type === "success" ? "#d4edda"  : "#f8d7da";
-  el.style.border          = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
+  messageEl.textContent           = msg;
+  messageEl.style.display         = "block";
+  messageEl.style.color           = type === "success" ? "#155724" : "#721c24";
+  messageEl.style.backgroundColor = type === "success" ? "#d4edda"  : "#f8d7da";
+  messageEl.style.border          = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
+}
+
+function hideMessage() {
+  messageEl.style.display = "none";
 }
