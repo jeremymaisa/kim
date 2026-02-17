@@ -41,7 +41,7 @@ if (avatarInput) {
 // Logout
 window.confirmLogout = async () => {
   await signOut(auth);
-  window.location.href = "../login.html";
+  window.location.replace("../login.html");
 };
 
 // List of public pages (no login required)
