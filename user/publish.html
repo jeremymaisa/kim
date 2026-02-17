@@ -1,104 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ICCTory - Published Papers</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="../css/publish.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/publish.css" />
+  </head>
+  <body>
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-banner">
-                <div class="logo-circle">
-                    <img src="../img/icct.jpeg" alt="ICCT Logo" class="logo-img">
-                </div>
-                <h1 class="brand-title">ICCTory</h1>
+      <aside class="sidebar">
+        <div class="sidebar-banner">
+          <div class="logo-circle">
+            <img src="../img/icct.jpeg" alt="ICCT Logo" class="logo-img" />
+          </div>
+          <h1 class="brand-title">ICCTory</h1>
+        </div>
+        <nav class="nav-menu">
+          <a href="../index.html" class="nav-item">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+          <a href="upload.html" class="nav-item">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+          </a>
+          <a href="publish.html" class="nav-item active">
+            <i class="fa-solid fa-clipboard-list"></i> Your Requests
+          </a>
+          <a href="research.html" class="nav-item">
+            <i class="fa-solid fa-file-lines"></i> Research Papers
+          </a>
+          <a href="about.html" class="nav-item">
+            <i class="fa-solid fa-circle-info"></i> About
+          </a>
+          <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i> Profile
+          </a>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-wrapper">
+          <header class="content-header">
+            <div class="header-info">
+              <h2 class="page-title">Published</h2>
+              <p class="subtitle">
+                Your successfully published research papers.
+              </p>
             </div>
-            <nav class="nav-menu">
-                <a href="../index.html" class="nav-item">
-                    <i class="fa-solid fa-house"></i> Home
-                </a>
-                <a href="upload.html" class="nav-item">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload
-                </a>
-                <a href="publish.html" class="nav-item active">
-                    <i class="fa-solid fa-clipboard-list"></i> Your Requests
-                </a>
-                <a href="research.html" class="nav-item">
-                    <i class="fa-solid fa-file-lines"></i> Research Papers
-                </a>
-                <a href="about.html" class="nav-item">
-                    <i class="fa-solid fa-circle-info"></i> About
-                </a>
-                <a href="profile.html" class="nav-item">
-                    <i class="fa-solid fa-user"></i> Profile
-                </a>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <div class="page-wrapper">
-                <header class="content-header">
-                    <div class="header-info">
-                        <h2 class="page-title">Published</h2>
-                        <p class="subtitle">Your successfully published research papers.</p>
-                    </div>
-                    <div class="filter-bar">
-                        <a href="publish.html" class="filter-link">
-                            <button class="filter-btn active">Published</button>
-                        </a>
-                        <a href="pending.html" class="filter-link">
-                            <button class="filter-btn">Pending</button>
-                        </a>
-                        <a href="reject.html" class="filter-link">
-                            <button class="filter-btn">Rejected</button>
-                        </a>
-                    </div>
-                </header>
-
-                <hr class="divider">
-
-                <div class="table-container">
-                    <div class="table-header-labels">
-                        <span>User</span>
-                        <span>Research Title</span>
-                        <span>Date Published</span>
-                        <span>Status</span>
-                    </div>
-                    <div class="request-container" id="publishedList">
-                        </div>
-                </div>
+            <div class="filter-bar">
+              <a href="publish.html" class="filter-link">
+                <button class="filter-btn active">Published</button>
+              </a>
+              <a href="pending.html" class="filter-link">
+                <button class="filter-btn">Pending</button>
+              </a>
+              <a href="reject.html" class="filter-link">
+                <button class="filter-btn">Rejected</button>
+              </a>
             </div>
-        </main>
+          </header>
+
+          <hr class="divider" />
+
+          <div class="table-container">
+            <div class="table-header-labels">
+              <span>User</span>
+              <span>Research Title</span>
+              <span>Date Published</span>
+              <span>Status</span>
+            </div>
+            <div class="request-container" id="publishedList"></div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <script>
-        const data = Array(10).fill({ 
-            user: 'Student User', 
-            title: 'Development of ICCTory Repository System', 
-            date: 'Feb 10, 2026', 
-            status: 'Published' 
-        });
-
-        const container = document.getElementById('publishedList');
-        if (data.length > 0) {
-            data.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'request-row';
-                row.innerHTML = `
-                    <span class="cell user-cell">${item.user}</span>
-                    <span class="cell title-cell">${item.title}</span>
-                    <span class="cell date-cell">${item.date}</span>
-                    <span class="cell status-cell">
-                        <span class="status-badge published">${item.status}</span>
-                    </span>`;
-                container.appendChild(row);
-            });
-        } else {
-            container.innerHTML = `<p style="text-align:center; padding: 50px; color:rgba(255,255,255,0.2)">No published papers found.</p>`;
-        }
-    </script>
-</body>
+    <script src="/js/publish.js"></script>
+  </body>
 </html>
