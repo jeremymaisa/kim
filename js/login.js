@@ -25,7 +25,7 @@ form.addEventListener("submit", async (e) => {
     console.log("Logged in:", user.email);
     showMessage("Login successful! Redirecting...", "success");
     setTimeout(() => {
-      window.location.href = "dashboard.html"; // Change to your actual landing page
+      window.location.href = "index.html"; // direct to index page
     }, 1500);
   } catch (error) {
     console.error("Login error:", error.code);
