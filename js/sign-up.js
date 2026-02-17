@@ -1,6 +1,6 @@
 // js/sign-up.js
 import { auth } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const form = document.querySelector("form");
 const submitBtn = document.getElementById("submit");
@@ -8,11 +8,12 @@ const submitBtn = document.getElementById("submit");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
+  const name     = document.getElementById("name").value.trim();
+  const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // Basic validation
-  if (!email || !password) {
+  // Validation
+  if (!name || !email || !password) {
     showMessage("Please fill in all fields.", "error");
     return;
   }
@@ -26,13 +27,20 @@ form.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Signing up...";
 
   try {
+    // 1. Create the account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    console.log("User registered:", user.email);
-    showMessage("Account created successfully! Redirecting to login...", "success");
+
+    // 2. Save the full name as Firebase display name
+    await updateProfile(user, { displayName: name });
+
+    console.log("User registered:", user.email, "| Name:", name);
+    showMessage(`Account created! Welcome, ${name}. Redirecting to login...`, "success");
+
     setTimeout(() => {
       window.location.href = "login.html";
     }, 2000);
+
   } catch (error) {
     console.error("Sign-up error:", error.code);
     showMessage(getFriendlyError(error.code), "error");
