@@ -4,19 +4,20 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/fi
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // =============================================
-// 🔧 REPLACE THESE WITH YOUR CLOUDINARY VALUES
-const CLOUDINARY_CLOUD_NAME  = "dfndi4mbt ";
-const CLOUDINARY_UPLOAD_PRESET = "upload ";
+// 🔧 YOUR CLOUDINARY VALUES
+const CLOUDINARY_CLOUD_NAME    = "dfndi4mbt";
+const CLOUDINARY_UPLOAD_PRESET = "upload";
 // =============================================
 
-let currentUser = null;
+const getCurrentUser = () => new Promise((resolve) => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    unsubscribe();
+    resolve(user);
+  });
+});
 
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUser = user;
-  } else {
-    window.location.href = "../login.html";
-  }
+  if (!user) window.location.href = "../login.html";
 });
 
 // File chooser
@@ -25,13 +26,12 @@ const customBtn  = document.getElementById("custom-button");
 const customText = document.getElementById("custom-text");
 
 customBtn.addEventListener("click", () => realFile.click());
-
 realFile.addEventListener("change", () => {
   const file = realFile.files[0];
   customText.textContent = file ? file.name : "No file chosen, yet.";
 });
 
-// Form
+// Form elements
 const form        = document.querySelector(".upload-form");
 const confirmBtn  = document.querySelector(".confirm-btn");
 const progressBox = document.getElementById("progress-box");
@@ -42,8 +42,10 @@ const messageEl   = document.getElementById("upload-message");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
     showMessage("You must be logged in to upload.", "error");
+    window.location.href = "../login.html";
     return;
   }
 
@@ -62,22 +64,18 @@ form.addEventListener("submit", async (e) => {
   hideMessage();
   confirmBtn.disabled    = true;
   confirmBtn.textContent = "Uploading...";
-
-  // Show progress bar
   progressBox.style.display = "block";
   progressPct.textContent   = "0%";
   progressBar.style.width   = "0%";
 
   try {
-    // Upload to Cloudinary using XMLHttpRequest so we get real progress
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    formData.append("resource_type", "raw"); // for PDF, DOC, DOCX
 
     const uploadURL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`;
 
-    const downloadURL = await new Promise((resolve, reject) => {
+    const cloudinaryData = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 
       xhr.upload.addEventListener("progress", (event) => {
@@ -90,26 +88,27 @@ form.addEventListener("submit", async (e) => {
 
       xhr.addEventListener("load", () => {
         if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          resolve(response.secure_url);
+          resolve(JSON.parse(xhr.responseText));
         } else {
-          reject(new Error("Cloudinary upload failed: " + xhr.statusText));
+          // ⚠️ Log the full error response so we can see exactly what's wrong
+          console.error("Cloudinary error response:", xhr.responseText);
+          reject(new Error("Cloudinary error: " + xhr.status + " — " + xhr.responseText));
         }
       });
 
       xhr.addEventListener("error", () => reject(new Error("Network error during upload.")));
-
       xhr.open("POST", uploadURL);
       xhr.send(formData);
     });
 
-    // Save metadata to Firestore
+    let fileURL = cloudinaryData.secure_url;
+
     await addDoc(collection(db, "research"), {
       title,
       authors,
       department,
       schoolYear,
-      fileURL:    downloadURL,
+      fileURL,
       fileName:   file.name,
       uploadedBy: currentUser.displayName || currentUser.email,
       userId:     currentUser.uid,
