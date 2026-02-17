@@ -43,3 +43,24 @@ window.confirmLogout = async () => {
   await signOut(auth);
   window.location.href = "../login.html";
 };
+
+// List of public pages (no login required)
+const publicPages = [
+  "/login.html",
+  "/register.html"
+];
+
+// Get current page
+const currentPage = window.location.pathname;
+
+// Check auth state
+onAuthStateChanged(auth, (user) => {
+
+  // If NOT logged in and page is protected
+  if (!user && !publicPages.some(page => currentPage.endsWith(page))) {
+    
+    // Redirect to login
+    window.location.href = "/login.html";
+  }
+
+});
