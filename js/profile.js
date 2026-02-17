@@ -60,7 +60,7 @@ onAuthStateChanged(auth, (user) => {
   if (!user && !publicPages.some(page => currentPage.endsWith(page))) {
     
     // Redirect to login
-    window.location.href = "/login.html";
+    window.location.replace("/login.html");
   }
 
 });
