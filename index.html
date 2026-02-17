@@ -1,73 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ICCTory | Research Repository</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/index.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/index.css" />
+    <style>
+      .topbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 28px;
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .user-greeting {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .user-greeting i {
+        font-size: 16px;
+        color: #a78bfa;
+      }
+
+      .logout-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        transition:
+          background 0.2s,
+          border-color 0.2s;
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body>
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-banner">
-                <div class="logo-circle">
-                    <img src="img/icct.jpeg" alt="ICCT Logo" class="logo-img">
-                </div>
-                <h1 class="brand-title">ICCTORY</h1>
-            </div>
-            
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-item active">
-                    <i class="fa-solid fa-house"></i> Home
-                </a>
-                <a href="user/upload.html" class="nav-item">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload
-                </a>
-                <a href="user/publish.html" class="nav-item">
-                    <i class="fa-solid fa-clipboard-list"></i> Your Requests
-                </a>
-                <a href="user/research.html" class="nav-item">
-                    <i class="fa-solid fa-file-lines"></i> Research Papers
-                </a>
-                <a href="user/about.html" class="nav-item">
-                    <i class="fa-solid fa-circle-info"></i> About
-                </a>
-                <a href="user/profile.html" class="nav-item">
-                    <i class="fa-solid fa-user"></i> Profile
-                </a>
-            </nav>
-        </aside>
+      <aside class="sidebar">
+        <div class="sidebar-banner">
+          <div class="logo-circle">
+            <img src="img/icct.jpeg" alt="ICCT Logo" class="logo-img" />
+          </div>
+          <h1 class="brand-title">ICCTORY</h1>
+        </div>
 
-        <main class="main-content">
-            <div class="hero-wrapper">
-                <h2 class="hero-text">
-                    A Centralized Repository of Verified Research Papers from ICCT students.
-                </h2>
-                
-                <div class="search-section">
-                    <a href="user/research.html" class="pill-button search-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 12px;">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        Browse Research Papers
-                    </a>
-                </div>
+        <nav class="nav-menu">
+          <a href="index.html" class="nav-item active">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+          <a href="user/upload.html" class="nav-item">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+          </a>
+          <a href="user/publish.html" class="nav-item">
+            <i class="fa-solid fa-clipboard-list"></i> Your Requests
+          </a>
+          <a href="user/research.html" class="nav-item">
+            <i class="fa-solid fa-file-lines"></i> Research Papers
+          </a>
+          <a href="user/about.html" class="nav-item">
+            <i class="fa-solid fa-circle-info"></i> About
+          </a>
+          <a href="user/profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i> Profile
+          </a>
+        </nav>
+      </aside>
 
-                <div class="stats-pill">
-                    <div class="stat-item">
-                        <i class="fa-solid fa-file-circle-check"></i>
-                        <span>Total Papers: <strong>327</strong></span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        <span>Departments: <strong>14</strong></span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fa-solid fa-calendar-days"></i>
-                        <span>School year: <strong>2021 - 2026</strong></span>
-                    </div>
-                </div>
+      <main class="main-content">
+        <!-- ✅ Top bar with greeting + logout -->
+        <div class="topbar">
+          <span class="user-greeting">
+            <i class="fa-solid fa-circle-user"></i>
+            <span id="user-greeting">Welcome!</span>
+          </span>
+          <button class="logout-btn" id="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+
+        <div class="hero-wrapper">
+          <h2 class="hero-text">
+            A Centralized Repository of Verified Research Papers from ICCT
+            students.
+          </h2>
+
+          <div class="search-section">
+            <a
+              href="user/research.html"
+              class="pill-button search-btn"
+              style="
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+              "
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Browse Research Papers
+            </a>
+          </div>
+
+          <div class="stats-pill">
+            <div class="stat-item">
+              <i class="fa-solid fa-file-circle-check"></i>
+              <span>Total Papers: <strong>327</strong></span>
             </div>
-        </main>
+            <div class="stat-item">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span>Departments: <strong>14</strong></span>
+            </div>
+            <div class="stat-item">
+              <i class="fa-solid fa-calendar-days"></i>
+              <span>School year: <strong>2021 - 2026</strong></span>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-</body>
+
+    <!-- ✅ Firebase auth check + greeting -->
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/index.js"></script>
+  </body>
 </html>
