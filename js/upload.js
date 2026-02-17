@@ -1,8 +1,13 @@
 // js/upload.js
-import { auth, db, storage } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
+
+// =============================================
+// 🔧 REPLACE THESE WITH YOUR CLOUDINARY VALUES
+const CLOUDINARY_CLOUD_NAME  = "dfndi4mbt";
+const CLOUDINARY_UPLOAD_PRESET = "upload rerearch";
+// =============================================
 
 let currentUser = null;
 
@@ -26,7 +31,7 @@ realFile.addEventListener("change", () => {
   customText.textContent = file ? file.name : "No file chosen, yet.";
 });
 
-// Form submit
+// Form
 const form        = document.querySelector(".upload-form");
 const confirmBtn  = document.querySelector(".confirm-btn");
 const progressBox = document.getElementById("progress-box");
@@ -58,26 +63,47 @@ form.addEventListener("submit", async (e) => {
   confirmBtn.disabled    = true;
   confirmBtn.textContent = "Uploading...";
 
-  progressBox.style.display    = "block";
-  progressPct.textContent      = "Uploading...";
-  progressBar.style.transition = "none";
-  progressBar.style.width      = "30%";
-
-  setTimeout(() => {
-    progressBar.style.transition = "width 8s ease";
-    progressBar.style.width      = "90%";
-  }, 100);
+  // Show progress bar
+  progressBox.style.display = "block";
+  progressPct.textContent   = "0%";
+  progressBar.style.width   = "0%";
 
   try {
-    const fileRef = ref(storage, `research/${Date.now()}_${file.name}`);
-    await uploadBytes(fileRef, file);
+    // Upload to Cloudinary using XMLHttpRequest so we get real progress
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    formData.append("resource_type", "raw"); // for PDF, DOC, DOCX
 
-    progressBar.style.transition = "width 0.3s ease";
-    progressBar.style.width      = "100%";
-    progressPct.textContent      = "100%";
+    const uploadURL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`;
 
-    const downloadURL = await getDownloadURL(fileRef);
+    const downloadURL = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
 
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const pct = Math.round((event.loaded / event.total) * 100);
+          progressBar.style.width = pct + "%";
+          progressPct.textContent = pct + "%";
+        }
+      });
+
+      xhr.addEventListener("load", () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          resolve(response.secure_url);
+        } else {
+          reject(new Error("Cloudinary upload failed: " + xhr.statusText));
+        }
+      });
+
+      xhr.addEventListener("error", () => reject(new Error("Network error during upload.")));
+
+      xhr.open("POST", uploadURL);
+      xhr.send(formData);
+    });
+
+    // Save metadata to Firestore
     await addDoc(collection(db, "research"), {
       title,
       authors,
@@ -91,6 +117,9 @@ form.addEventListener("submit", async (e) => {
       createdAt:  serverTimestamp()
     });
 
+    progressBar.style.width = "100%";
+    progressPct.textContent = "100%";
+
     setTimeout(() => {
       progressBox.style.display = "none";
       showMessage("Research submitted! It is now pending review.", "success");
@@ -101,9 +130,9 @@ form.addEventListener("submit", async (e) => {
     }, 500);
 
   } catch (err) {
-    console.error("Upload error:", err.code, err.message);
+    console.error("Upload error:", err);
     progressBox.style.display = "none";
-    showMessage("Upload failed: " + (err.message || "Please check your connection."), "error");
+    showMessage("Upload failed: " + err.message, "error");
     confirmBtn.disabled    = false;
     confirmBtn.textContent = "Confirm & Submit";
   }
