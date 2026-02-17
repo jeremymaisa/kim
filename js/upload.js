@@ -6,7 +6,7 @@ import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/fir
 // =============================================
 // 🔧 REPLACE THESE WITH YOUR CLOUDINARY VALUES
 const CLOUDINARY_CLOUD_NAME  = "dfndi4mbt";
-const CLOUDINARY_UPLOAD_PRESET = "upload rerearch";
+const CLOUDINARY_UPLOAD_PRESET = "upload";
 // =============================================
 
 let currentUser = null;
