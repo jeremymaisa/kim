@@ -9,53 +9,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="css/index.css" />
-    <style>
-      .topbar {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 16px;
-        padding: 14px 28px;
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .user-greeting {
-        font-size: 14px;
-        font-weight: 600;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .user-greeting i {
-        font-size: 16px;
-        color: #a78bfa;
-      }
-
-      .logout-btn {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 6px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        transition:
-          background 0.2s,
-          border-color 0.2s;
-      }
-
-      .logout-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.5);
-      }
-    </style>
   </head>
   <body>
     <div class="dashboard-container">
@@ -90,18 +43,10 @@
       </aside>
 
       <main class="main-content">
-        <!-- ✅ Top bar with greeting + logout -->
-        <div class="topbar">
-          <span class="user-greeting">
-            <i class="fa-solid fa-circle-user"></i>
-            <span id="user-greeting">Welcome!</span>
-          </span>
-          <button class="logout-btn" id="logout-btn">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-          </button>
-        </div>
-
         <div class="hero-wrapper">
+          <!-- ✅ Simple welcome message -->
+          <p id="user-greeting"></p>
+
           <h2 class="hero-text">
             A Centralized Repository of Verified Research Papers from ICCT
             students.
@@ -142,7 +87,6 @@
       </main>
     </div>
 
-    <!-- ✅ Firebase auth check + greeting -->
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/index.js"></script>
   </body>
