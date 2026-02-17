@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/fi
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // =============================================
-// 🔧 YOUR CLOUDINARY VALUES
+//  YOUR CLOUDINARY VALUES
 const CLOUDINARY_CLOUD_NAME    = "dfndi4mbt";
 const CLOUDINARY_UPLOAD_PRESET = "upload";
 // =============================================
