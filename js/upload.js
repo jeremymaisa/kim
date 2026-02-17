@@ -1,5 +1,5 @@
 // js/upload.js
-import { auth, db, storage } from "./js/firebase.js";
+import { auth, db, storage } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
@@ -58,24 +58,20 @@ form.addEventListener("submit", async (e) => {
   confirmBtn.disabled    = true;
   confirmBtn.textContent = "Uploading...";
 
-  // Show progress bar as indeterminate (animating) while uploading
-  progressBox.style.display = "block";
-  progressPct.textContent   = "Uploading...";
-  progressBar.style.width   = "30%";
+  progressBox.style.display    = "block";
+  progressPct.textContent      = "Uploading...";
   progressBar.style.transition = "none";
+  progressBar.style.width      = "30%";
 
-  // Animate bar slowly to 90% while waiting
   setTimeout(() => {
     progressBar.style.transition = "width 8s ease";
     progressBar.style.width      = "90%";
   }, 100);
 
   try {
-    // uploadBytes instead of uploadBytesResumable — simpler, no CORS issues
     const fileRef = ref(storage, `research/${Date.now()}_${file.name}`);
     await uploadBytes(fileRef, file);
 
-    // Done — jump to 100%
     progressBar.style.transition = "width 0.3s ease";
     progressBar.style.width      = "100%";
     progressPct.textContent      = "100%";

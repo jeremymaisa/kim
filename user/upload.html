@@ -9,6 +9,42 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
     <link rel="stylesheet" href="../css/upload.css" />
+    <style>
+      #progress-box {
+        display: none;
+        margin-top: 14px;
+        width: 100%;
+      }
+      #progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #555;
+      }
+      #progress-track {
+        background: #e0e0e0;
+        border-radius: 999px;
+        height: 12px;
+        overflow: hidden;
+      }
+      #progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #6c63ff, #a78bfa);
+        border-radius: 999px;
+      }
+      #upload-message {
+        display: none;
+        margin-top: 14px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        padding: 10px 14px;
+        border-radius: 8px;
+      }
+    </style>
   </head>
   <body>
     <div class="app-container">
@@ -115,11 +151,26 @@
             </div>
             <button type="submit" class="confirm-btn">Confirm & Submit</button>
           </div>
+
+          <!-- Progress bar -->
+          <div id="progress-box">
+            <div id="progress-label">
+              <span>Uploading file...</span>
+              <span id="progress-pct">0%</span>
+            </div>
+            <div id="progress-track">
+              <div id="progress-fill"></div>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <p id="upload-message"></p>
         </form>
       </main>
     </div>
 
-    <script type="module" src="./js/firebase.js"></script>
-    <script type="module" src="./js/upload.js"></script>
+    <!-- ✅ Both in js/ folder, called from user/ so path is ../js/ -->
+    <script type="module" src="../js/firebase.js"></script>
+    <script type="module" src="../js/upload.js"></script>
   </body>
 </html>
