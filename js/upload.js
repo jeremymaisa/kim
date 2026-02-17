@@ -90,7 +90,7 @@ form.addEventListener("submit", async (e) => {
         if (xhr.status === 200) {
           resolve(JSON.parse(xhr.responseText));
         } else {
-          // ⚠️ Log the full error response so we can see exactly what's wrong
+          // Log the full error response so we can see exactly what's wrong
           console.error("Cloudinary error response:", xhr.responseText);
           reject(new Error("Cloudinary error: " + xhr.status + " — " + xhr.responseText));
         }
