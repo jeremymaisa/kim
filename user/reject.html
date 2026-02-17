@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ICCTory - Rejected Requests</title>
+    <title>ICCTory - Rejected Papers</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
-    <link rel="stylesheet" href="../css/reject.css" />
+    <link rel="stylesheet" href="../css/publish.css" />
   </head>
   <body>
     <div class="dashboard-container">
@@ -46,9 +46,7 @@
           <header class="content-header">
             <div class="header-info">
               <h2 class="page-title">Rejected</h2>
-              <p class="subtitle">
-                Research papers that did not meet the requirements.
-              </p>
+              <p class="subtitle">Research papers that were not approved.</p>
             </div>
             <div class="filter-bar">
               <a href="publish.html" class="filter-link"
@@ -62,14 +60,12 @@
               >
             </div>
           </header>
-
           <hr class="divider" />
-
           <div class="table-container">
             <div class="table-header-labels">
               <span>User</span>
               <span>Research Title</span>
-              <span>Date Rejected</span>
+              <span>Date Submitted</span>
               <span>Status</span>
             </div>
             <div class="request-container" id="rejectedList"></div>
@@ -78,7 +74,8 @@
       </main>
     </div>
 
-    <script src="/js/reject.js"></script>
+    <script type="module" src="../js/firebase.js"></script>
+    <script type="module" src="../js/reject.js"></script>
     <script type="module" src="./js/authGuard.js"></script>
   </body>
 </html>

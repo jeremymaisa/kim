@@ -1,24 +1,48 @@
-const data = Array(10).fill({ 
-            user: 'Student User', 
-            title: 'Development of ICCTory Repository System', 
-            date: 'Feb 10, 2026', 
-            status: 'Published' 
-        });
+// js/publish.js
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-        const container = document.getElementById('publishedList');
-        if (data.length > 0) {
-            data.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'request-row';
-                row.innerHTML = `
-                    <span class="cell user-cell">${item.user}</span>
-                    <span class="cell title-cell">${item.title}</span>
-                    <span class="cell date-cell">${item.date}</span>
-                    <span class="cell status-cell">
-                        <span class="status-badge published">${item.status}</span>
-                    </span>`;
-                container.appendChild(row);
-            });
-        } else {
-            container.innerHTML = `<p style="text-align:center; padding: 50px; color:rgba(255,255,255,0.2)">No published papers found.</p>`;
-        }
+onAuthStateChanged(auth, (user) => {
+  if (!user) { window.location.href = "../login.html"; return; }
+  loadPapers("published", "publishedList");
+});
+
+function loadPapers(status, containerId) {
+  const container = document.getElementById(containerId);
+  const q = query(collection(db, "research"), where("status", "==", status));
+
+  onSnapshot(q, (snapshot) => {
+    container.innerHTML = "";
+
+    if (snapshot.empty) {
+      container.innerHTML = `<p class="empty-msg">No ${status} papers yet.</p>`;
+      return;
+    }
+
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+      const date = d.createdAt?.toDate().toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric"
+      }) || "—";
+
+      const row = document.createElement("div");
+      row.className = "request-row";
+      row.innerHTML = `
+        <span class="col-user">${d.uploadedBy || "—"}</span>
+        <span class="col-title">
+          <a href="${d.fileURL}" target="_blank" title="View file">${d.title}</a>
+        </span>
+        <span class="col-date">${date}</span>
+        <span class="col-status">
+          <span class="badge badge-${status}">${capitalize(status)}</span>
+        </span>
+      `;
+      container.appendChild(row);
+    });
+  });
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
