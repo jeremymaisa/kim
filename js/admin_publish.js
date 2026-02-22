@@ -9,12 +9,12 @@ requireRole("admin", () => {
 
 function loadPending() {
   const container = document.getElementById("requestList");
-  const q = query(collection(db, "research"), where("status", "==", "pending"));
+  const q = query(collection(db, "research"), where("status", "==", "publish"));
 
   onSnapshot(q, (snapshot) => {
     container.innerHTML = "";
     if (snapshot.empty) {
-      container.innerHTML = `<p class="empty-msg">No pending papers at the moment.</p>`;
+      container.innerHTML = `<p class="empty-msg">No published papers at the moment.</p>`;
       return;
     }
     snapshot.forEach((docSnap) => {
