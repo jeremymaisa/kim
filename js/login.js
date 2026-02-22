@@ -9,7 +9,7 @@ const loginBtn = form.querySelector("button[type='submit']");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = form.querySelector("input[type='email']").value.trim();
+  const email    = form.querySelector("input[type='email']").value.trim();
   const password = form.querySelector("input[type='password']").value.trim();
 
   if (!email || !password) {
@@ -24,17 +24,26 @@ form.addEventListener("submit", async (e) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // 🔍 Fetch role from Firestore
     const userDoc = await getDoc(doc(db, "users", user.uid));
-    const role = userDoc.exists() ? userDoc.data().role : "student";
+
+    // If no Firestore doc found, default to student
+    if (!userDoc.exists()) {
+      console.warn("No user document found in Firestore for UID:", user.uid);
+      showMessage("Login successful! Redirecting...", "success");
+      setTimeout(() => { window.location.href = "index.html"; }, 1500);
+      return;
+    }
+
+    const role = userDoc.data().role;
+    console.log("Role found:", role); // 👈 check this in console
 
     showMessage("Login successful! Redirecting...", "success");
 
     setTimeout(() => {
       if (role === "admin") {
-        window.location.href = "/adminPage/admin_index.html";      // 👑 Admin dashboard
+        window.location.href = "admin/admin_index.html"; // ✅ lowercase, no leading slash
       } else {
-        window.location.href = "index.html"; // 🎓 Student dashboard
+        window.location.href = "index.html";
       }
     }, 1500);
 
@@ -79,7 +88,7 @@ function showMessage(msg, type) {
     form.after(el);
   }
   el.textContent = msg;
-  el.style.color = type === "success" ? "#155724" : "#721c24";
+  el.style.color           = type === "success" ? "#155724" : "#721c24";
   el.style.backgroundColor = type === "success" ? "#d4edda" : "#f8d7da";
-  el.style.border = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
+  el.style.border          = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
 }
