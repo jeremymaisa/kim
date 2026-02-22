@@ -7,7 +7,6 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://w
 const storage = getStorage();
 let currentUser = null;
 
-// Wait for auth before allowing upload
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "../login.html";
@@ -34,10 +33,11 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const title   = form.querySelector("input[placeholder*='title']").value.trim();
-  const authors = form.querySelector("input[placeholder*='Juan']").value.trim();
-  const dept    = form.querySelector("select:nth-of-type(1)").value;
-  const year    = form.querySelector("select:nth-of-type(2)").value;
+  // ✅ Using IDs now — no more null errors
+  const title   = document.getElementById("researchTitle").value.trim();
+  const authors = document.getElementById("researchAuthors").value.trim();
+  const dept    = document.getElementById("researchDept").value;
+  const year    = document.getElementById("researchYear").value;
   const file    = realFile.files[0];
 
   if (!title || !authors || !file) {
@@ -45,14 +45,13 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Show progress bar
   const progressBox  = document.getElementById("progress-box");
   const progressFill = document.getElementById("progress-fill");
   const progressPct  = document.getElementById("progress-pct");
   const uploadMsg    = document.getElementById("upload-message");
   progressBox.style.display = "block";
+  uploadMsg.style.display   = "none";
 
-  // Upload file to Firebase Storage
   const storageRef = ref(storage, `research/${Date.now()}_${file.name}`);
   const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -64,26 +63,29 @@ form.addEventListener("submit", async (e) => {
     },
     (error) => {
       console.error("Upload error:", error);
-      uploadMsg.textContent = "Upload failed. Please try again.";
-      uploadMsg.style.display = "block";
+      progressBox.style.display = "none";
+      uploadMsg.textContent         = "❌ Upload failed. Please try again.";
+      uploadMsg.style.display       = "block";
+      uploadMsg.style.color         = "#721c24";
+      uploadMsg.style.backgroundColor = "#f8d7da";
+      uploadMsg.style.border        = "1px solid #f5c6cb";
     },
     async () => {
       const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-      // ✅ Save to Firestore with uploadedBy = user's email
       await addDoc(collection(db, "research"), {
-        title:      title,
-        authors:    authors,
-        dept:       dept,
-        year:       year,
-        fileURL:    fileURL,
-        uploadedBy: currentUser.email,   // 👈 this is what admin queries use
-        uploadedUID: currentUser.uid,    // 👈 also save UID for filtering
-        status:     "pending",           // always starts as pending
-        createdAt:  serverTimestamp()
+        title:       title,
+        authors:     authors,
+        dept:        dept,
+        year:        year,
+        fileURL:     fileURL,
+        uploadedBy:  currentUser.email,
+        uploadedUID: currentUser.uid,
+        status:      "pending",
+        createdAt:   serverTimestamp()
       });
 
-      progressBox.style.display = "none";
+      progressBox.style.display     = "none";
       uploadMsg.textContent         = "✅ Uploaded successfully! Awaiting admin approval.";
       uploadMsg.style.display       = "block";
       uploadMsg.style.color         = "#155724";
