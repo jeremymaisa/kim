@@ -53,7 +53,7 @@ form.addEventListener("submit", async (e) => {
 
     setTimeout(() => {
       if (actualRole === "admin") {
-        window.location.href = "adminpage/admin_index.html";
+        window.location.href = "admin/admin_index.html";
       } else {
         window.location.href = "index.html";
       }
