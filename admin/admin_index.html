@@ -89,8 +89,7 @@
         </div>
       </main>
     </div>
-    <!-- Add this inside admin_index.html, before </body> -->
-    <!-- For all pages inside /adminpage/ folder -->
+    <!-- All files inside /admin/ folder -->
     <script type="module">
       import { requireRole } from "../js/auth_redirect.js";
       requireRole("admin", (user) => {
