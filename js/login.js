@@ -34,7 +34,7 @@ form.addEventListener("submit", async (e) => {
       if (role === "admin") {
         window.location.href = "admin_index.html";      // 👑 Admin dashboard
       } else {
-        window.location.href = "student/student_index.html"; // 🎓 Student dashboard
+        window.location.href = "index.html"; // 🎓 Student dashboard
       }
     }, 1500);
 
