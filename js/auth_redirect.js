@@ -1,8 +1,3 @@
-// js/auth_redirect.js
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
 export function requireRole(requiredRole, onAllowed) {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -14,11 +9,10 @@ export function requireRole(requiredRole, onAllowed) {
     const role = userDoc.exists() ? userDoc.data().role : "student";
 
     if (role !== requiredRole) {
-      // Redirect to the right dashboard based on their actual role
       if (role === "admin") {
-        window.location.href = "/admin/admin_index.html"; // ✅ lowercase
+        window.location.href = "/admin/admin_index.html";  // ✅
       } else {
-        window.location.href = "/index.html";
+        window.location.href = "/index.html";              // ✅
       }
       return;
     }
