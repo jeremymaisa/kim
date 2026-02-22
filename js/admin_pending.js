@@ -10,10 +10,15 @@ requireRole("admin", () => {
 function loadPending() {
   const container = document.getElementById("requestList");
 
-  // ✅ No uploadedBy filter — admin sees ALL pending papers from ALL students
-  const q = query(collection(db, "research"), where("status", "==", "pending"));
+  // ✅ Only filter by status — no uploadedUID filter so admin sees ALL students
+  const q = query(
+    collection(db, "research"),
+    where("status", "==", "pending")
+  );
 
   onSnapshot(q, (snapshot) => {
+    console.log("Pending papers found:", snapshot.size); // 👈 check this in console
+
     container.innerHTML = "";
 
     if (snapshot.empty) {
@@ -51,11 +56,9 @@ function loadPending() {
       container.appendChild(row);
     });
 
-    // ✅ Accept button
     container.querySelectorAll(".accept-btn").forEach((btn) =>
       btn.addEventListener("click", () => updateStatus(btn.dataset.id, "published"))
     );
-    // ✅ Reject button
     container.querySelectorAll(".reject-btn").forEach((btn) =>
       btn.addEventListener("click", () => updateStatus(btn.dataset.id, "rejected"))
     );
@@ -65,7 +68,7 @@ function loadPending() {
 async function updateStatus(id, status) {
   try {
     await updateDoc(doc(db, "research", id), { status });
-    console.log(`Paper ${id} updated to: ${status}`);
+    console.log(`Updated paper ${id} to ${status}`);
   } catch (err) {
     console.error("Failed to update:", err);
     alert("Could not update status. Please try again.");
