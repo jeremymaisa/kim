@@ -29,7 +29,26 @@
         <h2>Sign up</h2>
 
         <form>
-          <!-- Full Name field -->
+          <!-- ✅ Role Toggle -->
+          <div class="role-toggle">
+            <button
+              type="button"
+              class="role-btn active"
+              id="btnStudent"
+              onclick="setRole('student')"
+            >
+              <i class="fa-solid fa-graduation-cap"></i> Student
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              id="btnAdmin"
+              onclick="setRole('admin')"
+            >
+              <i class="fa-solid fa-user-shield"></i> Admin
+            </button>
+          </div>
+
           <div class="input-group">
             <label for="name">FULL NAME</label>
             <input
@@ -61,6 +80,17 @@
               required
             />
             <i class="fa-solid fa-lock"></i>
+          </div>
+
+          <!-- ✅ Admin secret key — only shows when Admin is selected -->
+          <div class="input-group" id="adminKeyGroup">
+            <label for="adminKey">ADMIN SECRET KEY</label>
+            <input
+              type="password"
+              placeholder="Enter admin secret key"
+              id="adminKey"
+            />
+            <i class="fa-solid fa-key"></i>
           </div>
 
           <button type="submit" class="signup-btn" id="submit">SIGN UP</button>

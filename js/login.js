@@ -3,8 +3,16 @@ import { auth, db } from "./firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const form = document.querySelector("form");
+const form     = document.querySelector("form");
 const loginBtn = form.querySelector("button[type='submit']");
+let selectedRole = "student"; // default
+
+// ✅ Toggle between Student and Admin
+window.setRole = function (role) {
+  selectedRole = role;
+  document.getElementById("btnStudent").classList.toggle("active", role === "student");
+  document.getElementById("btnAdmin").classList.toggle("active", role === "admin");
+};
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -24,24 +32,28 @@ form.addEventListener("submit", async (e) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    const userDoc = await getDoc(doc(db, "users", user.uid));
+    // ✅ Get actual role from Firestore
+    const userDoc  = await getDoc(doc(db, "users", user.uid));
+    const actualRole = userDoc.exists() ? userDoc.data().role : "student";
 
-    // If no Firestore doc found, default to student
-    if (!userDoc.exists()) {
-      console.warn("No user document found in Firestore for UID:", user.uid);
-      showMessage("Login successful! Redirecting...", "success");
-      setTimeout(() => { window.location.href = "index.html"; }, 1500);
+    // ✅ Check selected role matches actual role
+    if (selectedRole !== actualRole) {
+      showMessage(
+        selectedRole === "admin"
+          ? "This account is not an admin account."
+          : "Please select Admin to log in with this account.",
+        "error"
+      );
+      loginBtn.disabled = false;
+      loginBtn.textContent = "LOG IN";
       return;
     }
-
-    const role = userDoc.data().role;
-    console.log("Role found:", role); // 👈 check this in console
 
     showMessage("Login successful! Redirecting...", "success");
 
     setTimeout(() => {
-      if (role === "admin") {
-        window.location.href = "admin/admin_index.html"; // ✅ lowercase, no leading slash
+      if (actualRole === "admin") {
+        window.location.href = "adminpage/admin_index.html";
       } else {
         window.location.href = "index.html";
       }
@@ -87,7 +99,7 @@ function showMessage(msg, type) {
     `;
     form.after(el);
   }
-  el.textContent = msg;
+  el.textContent           = msg;
   el.style.color           = type === "success" ? "#155724" : "#721c24";
   el.style.backgroundColor = type === "success" ? "#d4edda" : "#f8d7da";
   el.style.border          = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;

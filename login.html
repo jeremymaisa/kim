@@ -29,6 +29,16 @@
         <h2>Log in</h2>
 
         <form>
+          <!-- ✅ Role Toggle -->
+          <div class="role-toggle">
+            <button type="button" class="role-btn active" id="btnStudent" onclick="setRole('student')">
+              <i class="fa-solid fa-graduation-cap"></i> Student
+            </button>
+            <button type="button" class="role-btn" id="btnAdmin" onclick="setRole('admin')">
+              <i class="fa-solid fa-user-shield"></i> Admin
+            </button>
+          </div>
+
           <div class="input-group">
             <input type="email" placeholder="Email Address" required />
             <i class="fa-solid fa-user"></i>
@@ -48,7 +58,6 @@
       </div>
     </div>
 
-    <!-- ✅ Both scripts must be type="module" since firebase.js uses ES module exports -->
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/login.js"></script>
   </body>

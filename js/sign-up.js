@@ -3,8 +3,24 @@ import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const form = document.querySelector("form");
+const form      = document.querySelector("form");
 const submitBtn = document.getElementById("submit");
+
+// ✅ Change this to whatever secret key you want for admin registration
+const ADMIN_SECRET_KEY = "icctory_admin_2024";
+
+let selectedRole = "student"; // default
+
+// ✅ Role toggle
+window.setRole = function (role) {
+  selectedRole = role;
+  document.getElementById("btnStudent").classList.toggle("active", role === "student");
+  document.getElementById("btnAdmin").classList.toggle("active", role === "admin");
+
+  // Show/hide admin key field
+  const adminKeyGroup = document.getElementById("adminKeyGroup");
+  adminKeyGroup.style.display = role === "admin" ? "block" : "none";
+};
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -23,27 +39,39 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  // ✅ If registering as admin, verify the secret key
+  if (selectedRole === "admin") {
+    const adminKey = document.getElementById("adminKey").value.trim();
+    if (adminKey !== ADMIN_SECRET_KEY) {
+      showMessage("Invalid admin secret key. Please try again.", "error");
+      return;
+    }
+  }
+
   submitBtn.disabled = true;
   submitBtn.textContent = "Signing up...";
 
   try {
-    // 1. Create the Auth account
+    // 1. Create Auth account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // 2. Save display name to Auth profile
+    // 2. Save display name
     await updateProfile(user, { displayName: name });
 
-    // 3. ✅ Save user role to Firestore — all sign-ups are students by default
+    // 3. ✅ Save role to Firestore — uses selectedRole (student or admin)
     await setDoc(doc(db, "users", user.uid), {
-      name: name,
-      email: email,
-      role: "student",
+      name:      name,
+      email:     email,
+      role:      selectedRole,   // 👈 saves whichever role was selected
       createdAt: new Date()
     });
 
-    console.log("User registered:", user.email);
-    showMessage(`Account created! Welcome, ${name}. Redirecting to login...`, "success");
+    console.log("User registered:", user.email, "| Role:", selectedRole);
+    showMessage(
+      `Account created! Welcome, ${name}. Redirecting to login...`,
+      "success"
+    );
 
     setTimeout(() => {
       window.location.href = "login.html";
@@ -85,8 +113,8 @@ function showMessage(msg, type) {
     `;
     form.after(el);
   }
-  el.textContent = msg;
-  el.style.color = type === "success" ? "#155724" : "#721c24";
+  el.textContent           = msg;
+  el.style.color           = type === "success" ? "#155724" : "#721c24";
   el.style.backgroundColor = type === "success" ? "#d4edda" : "#f8d7da";
-  el.style.border = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
+  el.style.border          = `1px solid ${type === "success" ? "#c3e6cb" : "#f5c6cb"}`;
 }

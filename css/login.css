@@ -158,3 +158,34 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+.role-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .role-btn {
+        flex: 1;
+        padding: 9px;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.4);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .role-btn.active {
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        border-color: #a78bfa;
+        color: #fff;
+      }
+
+      .role-btn:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+      }
