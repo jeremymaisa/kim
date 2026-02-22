@@ -20,7 +20,7 @@ export function requireRole(requiredRole, onAllowed) {
 
     if (requiredRole === "admin" && role !== "admin") {
       // Student tried to access admin page
-      window.location.href = "/student/student_index.html";
+      window.location.href = "/index.html";
       return;
     }
 
