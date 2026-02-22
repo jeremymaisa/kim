@@ -32,9 +32,9 @@ form.addEventListener("submit", async (e) => {
 
     setTimeout(() => {
       if (role === "admin") {
-        window.location.href = "admin_index.html";      // 👑 Admin dashboard
+        window.location.href = "/adminPage/admin_index.html";      // 👑 Admin dashboard
       } else {
-        window.location.href = "index.html"; // 🎓 Student dashboard
+        window.location.href = "/user/index.html"; // 🎓 Student dashboard
       }
     }, 1500);
 
