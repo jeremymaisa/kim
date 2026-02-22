@@ -42,7 +42,7 @@ form.addEventListener("submit", async (e) => {
   // ✅ If registering as admin, verify the secret key
   if (selectedRole === "admin") {
     const adminKey = document.getElementById("adminKey").value.trim();
-    if (adminKey !== admin) {
+    if (adminKey !== ADMIN_SECRET_KEY) {
       showMessage("Invalid admin secret key. Please try again.", "error");
       return;
     }
