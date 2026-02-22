@@ -4,15 +4,17 @@ import { requireRole } from "./auth_redirect.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 requireRole("student", (user) => {
-  loadMyPapers("pending", "pendingList", user.email);
+  loadMyPapers(user.uid);
 });
 
-function loadMyPapers(status, containerId, userEmail) {
-  const container = document.getElementById(containerId);
+function loadMyPapers(uid) {
+  const container = document.getElementById("pendingList");
+
+  // ✅ Filter by UID — student only sees their own papers
   const q = query(
     collection(db, "research"),
-    where("status", "==", status),
-    where("uploadedBy", "==", userEmail)
+    where("status", "==", "pending"),
+    where("uploadedUID", "==", uid)   // 👈 matches uploadedUID saved during upload
   );
 
   onSnapshot(q, (snapshot) => {
