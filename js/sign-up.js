@@ -1,6 +1,7 @@
 // js/sign-up.js
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const form = document.querySelector("form");
 const submitBtn = document.getElementById("submit");
@@ -12,7 +13,6 @@ form.addEventListener("submit", async (e) => {
   const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // Validation
   if (!name || !email || !password) {
     showMessage("Please fill in all fields.", "error");
     return;
@@ -27,14 +27,22 @@ form.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Signing up...";
 
   try {
-    // 1. Create the account
+    // 1. Create the Auth account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // 2. Save the full name as Firebase display name
+    // 2. Save display name to Auth profile
     await updateProfile(user, { displayName: name });
 
-    console.log("User registered:", user.email, "| Name:", name);
+    // 3. ✅ Save user role to Firestore — all sign-ups are students by default
+    await setDoc(doc(db, "users", user.uid), {
+      name: name,
+      email: email,
+      role: "student",
+      createdAt: new Date()
+    });
+
+    console.log("User registered:", user.email);
     showMessage(`Account created! Welcome, ${name}. Redirecting to login...`, "success");
 
     setTimeout(() => {
