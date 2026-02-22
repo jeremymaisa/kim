@@ -213,5 +213,12 @@
       </main>
     </div>
     <script src="/js/research.js"></script>
+    <!-- For all pages inside /adminpage/ folder -->
+    <script type="module">
+      import { requireRole } from "../js/auth_redirect.js";
+      requireRole("admin", (user) => {
+        console.log("Admin authenticated:", user.email);
+      });
+    </script>
   </body>
 </html>

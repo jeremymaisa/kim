@@ -1,27 +1,28 @@
-// js/pending.js
+// js/student_pending.js
 import { auth, db } from "./firebase.js";
 import { requireRole } from "./auth_redirect.js";
-import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-requireRole("admin", () => {
-  loadPending();
+requireRole("student", (user) => {
+  loadMyPapers("pending", "pendingList", user.email);
 });
 
-function loadPending() {
-  const container = document.getElementById("requestList");
-  const q = query(collection(db, "research"), where("status", "==", "pending"));
+function loadMyPapers(status, containerId, userEmail) {
+  const container = document.getElementById(containerId);
+  const q = query(
+    collection(db, "research"),
+    where("status", "==", status),
+    where("uploadedBy", "==", userEmail)
+  );
 
   onSnapshot(q, (snapshot) => {
     container.innerHTML = "";
-
     if (snapshot.empty) {
       container.innerHTML = `<p class="empty-msg">No pending papers at the moment.</p>`;
       return;
     }
-
     snapshot.forEach((docSnap) => {
       const d = docSnap.data();
-      const id = docSnap.id;
       const date = d.createdAt?.toDate().toLocaleDateString("en-US", {
         year: "numeric", month: "short", day: "numeric"
       }) || "—";
@@ -30,39 +31,11 @@ function loadPending() {
       row.className = "request-row";
       row.innerHTML = `
         <span class="col-user">${d.uploadedBy || "—"}</span>
-        <span class="col-title">
-          <a href="${d.fileURL}" target="_blank">${d.title}</a>
-        </span>
+        <span class="col-title"><a href="${d.fileURL}" target="_blank">${d.title}</a></span>
         <span class="col-date">${date}</span>
-        <span class="col-status">
-          <span class="badge badge-pending">Pending</span>
-        </span>
-        <span class="col-actions">
-          <button class="action-btn accept-btn" data-id="${id}">
-            <i class="fa-solid fa-check"></i> Accept
-          </button>
-          <button class="action-btn reject-btn" data-id="${id}">
-            <i class="fa-solid fa-xmark"></i> Reject
-          </button>
-        </span>
+        <span class="col-status"><span class="badge badge-pending">Pending</span></span>
       `;
       container.appendChild(row);
     });
-
-    container.querySelectorAll(".accept-btn").forEach((btn) => {
-      btn.addEventListener("click", () => updateStatus(btn.dataset.id, "published"));
-    });
-    container.querySelectorAll(".reject-btn").forEach((btn) => {
-      btn.addEventListener("click", () => updateStatus(btn.dataset.id, "rejected"));
-    });
   });
-}
-
-async function updateStatus(id, status) {
-  try {
-    await updateDoc(doc(db, "research", id), { status });
-  } catch (err) {
-    console.error("Failed to update status:", err);
-    alert("Could not update status. Please try again.");
-  }
 }

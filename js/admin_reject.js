@@ -1,19 +1,15 @@
-// js/student_reject.js
-import { auth, db } from "./firebase.js";
+// js/admin_reject.js
+import { db } from "./firebase.js";
 import { requireRole } from "./auth_redirect.js";
 import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-requireRole("student", (user) => {
-  loadMyPapers("rejected", "rejectedList", user.email);
+requireRole("admin", () => {
+  loadRejected();
 });
 
-function loadMyPapers(status, containerId, userEmail) {
-  const container = document.getElementById(containerId);
-  const q = query(
-    collection(db, "research"),
-    where("status", "==", status),
-    where("uploadedBy", "==", userEmail)
-  );
+function loadRejected() {
+  const container = document.getElementById("requestList");
+  const q = query(collection(db, "research"), where("status", "==", "rejected"));
 
   onSnapshot(q, (snapshot) => {
     container.innerHTML = "";
