@@ -1,15 +1,14 @@
 // js/pending.js
 import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { requireRole } from "./auth_redirect.js";
 import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) { window.location.href = "../login.html"; return; }
+requireRole("admin", () => {
   loadPending();
 });
 
 function loadPending() {
-  const container = document.getElementById("pendingList");
+  const container = document.getElementById("requestList");
   const q = query(collection(db, "research"), where("status", "==", "pending"));
 
   onSnapshot(q, (snapshot) => {
@@ -32,7 +31,7 @@ function loadPending() {
       row.innerHTML = `
         <span class="col-user">${d.uploadedBy || "—"}</span>
         <span class="col-title">
-          <a href="${d.fileURL}" target="_blank" title="View file">${d.title}</a>
+          <a href="${d.fileURL}" target="_blank">${d.title}</a>
         </span>
         <span class="col-date">${date}</span>
         <span class="col-status">
@@ -50,12 +49,9 @@ function loadPending() {
       container.appendChild(row);
     });
 
-    // Accept
     container.querySelectorAll(".accept-btn").forEach((btn) => {
       btn.addEventListener("click", () => updateStatus(btn.dataset.id, "published"));
     });
-
-    // Reject
     container.querySelectorAll(".reject-btn").forEach((btn) => {
       btn.addEventListener("click", () => updateStatus(btn.dataset.id, "rejected"));
     });

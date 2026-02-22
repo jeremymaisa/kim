@@ -1,11 +1,10 @@
 // js/publish.js
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { db } from "./firebase.js";
+import { requireRole } from "./auth_redirect.js";
+import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) { window.location.href = "../login.html"; return; }
-  loadPapers("published", "publishedList");
+requireRole("admin", () => {
+  loadPapers("published", "requestList");
 });
 
 function loadPapers(status, containerId) {
@@ -31,7 +30,7 @@ function loadPapers(status, containerId) {
       row.innerHTML = `
         <span class="col-user">${d.uploadedBy || "—"}</span>
         <span class="col-title">
-          <a href="${d.fileURL}" target="_blank" title="View file">${d.title}</a>
+          <a href="${d.fileURL}" target="_blank">${d.title}</a>
         </span>
         <span class="col-date">${date}</span>
         <span class="col-status">

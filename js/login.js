@@ -1,6 +1,7 @@
 // js/login.js
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const form = document.querySelector("form");
 const loginBtn = form.querySelector("button[type='submit']");
@@ -22,11 +23,21 @@ form.addEventListener("submit", async (e) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    console.log("Logged in:", user.email);
+
+    // 🔍 Fetch role from Firestore
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const role = userDoc.exists() ? userDoc.data().role : "student";
+
     showMessage("Login successful! Redirecting...", "success");
+
     setTimeout(() => {
-      window.location.href = "index.html"; // direct to index page
+      if (role === "admin") {
+        window.location.href = "admin_index.html";      // 👑 Admin dashboard
+      } else {
+        window.location.href = "student/student_index.html"; // 🎓 Student dashboard
+      }
     }, 1500);
+
   } catch (error) {
     console.error("Login error:", error.code);
     showMessage(getFriendlyError(error.code), "error");

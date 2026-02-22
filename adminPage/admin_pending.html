@@ -63,5 +63,13 @@
         </div>
       </main>
     </div>
+    <!-- Add this inside admin_index.html, before </body> -->
+    <script type="module">
+      import { requireRole } from "./js/auth_redirect.js";
+      requireRole("admin", (user) => {
+        console.log("Admin authenticated:", user.email);
+        // Optionally display user info in the UI
+      });
+    </script>
   </body>
 </html>
